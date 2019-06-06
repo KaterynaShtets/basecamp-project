@@ -13,6 +13,9 @@ using Microsoft.EntityFrameworkCore;
 using ClothShop.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ClothShop.Interface;
+using ClothShop.Models;
+using ClothShop.Services;
 
 namespace ClothShop
 {
@@ -38,11 +41,18 @@ namespace ClothShop
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>()
-                .AddDefaultUI(UIFramework.Bootstrap4)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                    .AddEntityFrameworkStores<ApplicationDbContext>()
+                 .AddDefaultUI()
+                 .AddDefaultTokenProviders();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            services.AddScoped<IRepository<Product>, ProductRepository>();
+            services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IRepository<Cart>, CartRepository>();
+            services.AddScoped<ICartService, CartService>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,6 +62,7 @@ namespace ClothShop
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
+                app.UseAuthentication();
             }
             else
             {
@@ -70,7 +81,7 @@ namespace ClothShop
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=Products}/{action=Index}/{id?}");
             });
         }
     }

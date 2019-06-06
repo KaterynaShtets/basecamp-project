@@ -1,0 +1,11 @@
+﻿@model Cart
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Cart</h1>
+
+@foreach(var i in Model.CartItems)
+{
+    <p><img src="@i.Product.Pictures.Select(p => p.Url).First()"  />| @i.Product.Name | @i.Count</p>
+}
